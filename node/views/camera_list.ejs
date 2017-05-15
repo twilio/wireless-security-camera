@@ -1,0 +1,78 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="page-header">
+      <h1 id="tables">Cameras</h1>
+    </div>
+
+    <div class="bs-component">
+      <table class="table table-striped table-hover ">
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>Contact Number</th>
+            <th>Twilio SID</th>
+            <th>Token</th>
+            <th>Created</th>
+            <th>Edit</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+        <% cameras.forEach(function(camera) { %>
+          <tr>
+            <td><%= camera.id %></td>
+            <td><%= camera.name %></td>
+            <td><%= camera.contect_number %></td>
+            <td><%= camera.twilio_sid %></td>
+            <td><%= camera.token %></td>
+            <td><%= moment(camera.created_at).format('MMM DD YYYY @ hh:mm') %></td>
+            <td><a href="/camera/<%= camera.id %>" class="btn btn-xs btn-success">Edit</a></td>
+            <td><a href="/delete-camera/<%= camera.id %>" class="btn btn-xs btn-danger">Delete</a></td>
+          </tr>
+        <% }) %>
+        </tbody>
+      </table>
+    <div id="source-button" class="btn btn-primary btn-xs" style="display: none;">&lt; &gt;</div></div><!-- /example -->
+  </div>
+  <div class="divider col-lg-10 bg-primary"></div>
+</div>
+
+<a href="#" class="btn btn-primary add-camera-show">Add New Camera</a>
+
+<div class="row add-camera">
+  <div class="col-lg-6">
+    <form class="form-horizontal" action="/add-camera" method="POST">
+      <fieldset>
+        <legend>New camera</legend>
+        <div class="form-group">
+          <label for="name" class="col-lg-2 control-label">Name</label>
+          <div class="col-lg-10">
+            <input type="text" class="form-control" name="name" id="name" placeholder="Name">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="contact_number" class="col-lg-2 control-label">Contact Number</label>
+          <div class="col-lg-10">
+            <input type="text" class="form-control" name="contact_number" id="contact_number" placeholder="4123620201">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="twilio_sid" class="col-lg-2 control-label">Twilio SIM SID</label>
+          <div class="col-lg-10">
+            <input type="text" class="form-control" name="twilio_sid" id="twilio_sid" placeholder="Twilio SIM SID">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="col-lg-10 col-lg-offset-2">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="reset" class="btn btn-default add-camera-cancel">Cancel</button>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
