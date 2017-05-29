@@ -1,0 +1,6 @@
+name: AlertGenerator
+description: |
+  Generate alerts according to incoming frames.
+path: /alert_generator
+script: AlertGenerator.js
+context:
