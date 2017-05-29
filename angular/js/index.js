@@ -31,6 +31,7 @@ angular
     $currentViewScope = $scope;
     currentView = dashboardView;
     $scope.cameras = app.cameras;
+    $scope.noCamera = function () { return Object.keys(app.cameras).length === 0; }
   }])
   .controller('CameraListViewCtrl', ['$scope', '$timeout', function ($scope, $timeout) {
     $currentViewScope = $scope;

@@ -14,8 +14,7 @@
             <th>Twilio SID</th>
             <th>Token</th>
             <th>Created</th>
-            <th>Edit</th>
-            <th>Delete</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -26,8 +25,10 @@
             <td>{{ camera.info.twilio_sim_sid }}</td>
             <td>{{ camera.info.token }}</td>
             <td>{{ camera.info.created_at }}</td>
-            <td><a href="#!/cameras/{{ camera.info.id }}/edit" class="btn btn-xs btn-success">Edit</a></td>
-            <td><button ng-click="deleteCamera(camera.id)" class="btn btn-xs btn-danger">Delete</button></td>
+            <td>
+                <a href="#!/cameras/{{ camera.info.id }}/edit" class="btn btn-xs btn-success">Edit</a>&nbsp;
+                <button ng-click="deleteCamera(camera.id)" class="btn btn-xs btn-danger">Delete</button>
+            </td>
           </tr>
         </tbody>
       </table>
