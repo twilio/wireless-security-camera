@@ -16,8 +16,6 @@ let clientBootstrapUrl = 'https://your-domain.twil.io/authenticate';
 let imageUploadUrl;
 
 let cameraSnapshot;
-let cameraAlerts;
-
 let stateCapturing = false;
 let statePreviewing = false;
 let stateArmed = false;
@@ -134,7 +132,7 @@ bootstrapClient(cameraId)
     return new SyncClient(config.token);
   })
   .then(client => {
-    client.map('camera.presence').then(map => {
+    client.map('cameras.presence').then(map => {
       console.log('Camera presense map:', map.sid);
       refreshPresence(map);
     });
@@ -149,10 +147,6 @@ bootstrapClient(cameraId)
         console.log('Remote control:', value);
         updateCameraState(value);
       });
-    });
-    client.list('cameras.' + cameraId + '.alerts').then(list => {
-      console.log('Alert list:', list.sid);
-      cameraAlerts = list;
     });
   })
   .catch(function(error) {
