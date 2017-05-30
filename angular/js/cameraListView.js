@@ -9,10 +9,26 @@ var cameraListView = {
     $scope.addCamera = function () {
       app.addCamera(angular.copy($scope.newCamera), function (err, cameraAdded) {
         if (err) {
-          cameraListView.onCameraAddingFailed(err);
+          $('#add-camera-failed').text(JSON.stringify(err));          
         } else {
           $scope.cameraAdded = cameraAdded;
-          cameraListView.onCameraAdded();
+          $('.add-camera').hide();
+          $('.add-camera-show').fadeIn(333);          
+          $scope.$apply();
+        }
+      });
+    };
+    $scope.editCamera = function (cameraId) {
+      $scope.editedCameraInfo = app.cameras[cameraId].info;
+      $('.edit-camera').fadeIn(333);
+    };
+    $scope.updateCamera = function () {
+      app.updateCamera(angular.copy($scope.editedCameraInfo), function (err) {
+        if (err) {
+          $('#edit-camera-failed').text(JSON.stringify(err));          
+        } else {
+          $scope.editedCameraInfo = null;
+          $('.edit-camera').hide();
           $scope.$apply();
         }
       });
@@ -29,15 +45,12 @@ var cameraListView = {
       $('.add-camera').hide();
       $('.add-camera-show').fadeIn(333);
     });
-  },
 
-  onCameraAddingFailed: function (err) {
-    $('#add-camera-failed').text(JSON.stringify(err));        
-  },
-
-  onCameraAdded: function () {
-      $('.add-camera').hide();
-      $('.add-camera-show').fadeIn(333);
+    $('.edit-camera-cancel').click(function() {
+      $scope.editedCameraInfo = null;
+      $('.edit-camera').hide();
+      $scope.$apply();
+    });
   },
 };
 

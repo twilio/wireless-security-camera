@@ -63,7 +63,6 @@ module.exports = function(callbacks) {
         } else {
           console.log("Loading new camera", camera);
           cameras[cameraId] = {
-            id: cameraId,
             info: camera
           };
           fetchSnapshot(cameras[cameraId]);
@@ -84,6 +83,14 @@ module.exports = function(callbacks) {
     }
 
     return invalidCameras;
+  }
+
+  function cameraInfoCheck(camera, callback) {
+    if (!newCamera.id || !newCamera.id.match(/^[a-zA-Z0-9]+$/))  { callback("camera id is invalid: " + newCamera.id); return false; }
+    if (!newCamera.name) { callback("camera name is not specified"); return false; }
+    if (!newCamera.contact_number || !newCamera.contact_number.match(/^[0-9]+$/)) { callback("camera contact number is invalid(only digits allowed): " + newCamera.contact_number); return false; }
+    if (!newCamera.twilio_sim_sid || !newCamera.twilio_sim_sid.match(/^DE[a-z0-9]{32}$/)) { callback("camera sim SID is invalid: " + newCamera.twilio_sim_sid); return false; }
+    return true;
   }
 
   return {
@@ -142,10 +149,7 @@ module.exports = function(callbacks) {
   },
 
   addCamera: function (newCamera, callback) {
-    if (!newCamera.id || !newCamera.id.match(/^[a-zA-Z0-9]+$/)) return callback("camera id is invalid: " + newCamera.id);
-    if (!newCamera.name) return callback("camera name is not specified");
-    if (!newCamera.contact_number || !newCamera.contact_number.match(/^[0-9]+$/)) return callback("camera contact number is invalid(only digits allowed): " + newCamera.contact_number);
-    if (!newCamera.twilio_sim_sid || !newCamera.twilio_sim_sid.match(/^DE[a-z0-9]{32}$/)) return callback("camera sim SID is invalid: " + newCamera.twilio_sim_sid);
+    if (!cameraInfoCheck(newCamera, callback)) return;
     if (newCamera.id in configDocument.value.cameras) return callback("Camera with the same ID exists");
     newCamera.created_at = moment().format(MOMENT_FORMAT);
 
@@ -160,6 +164,23 @@ module.exports = function(callbacks) {
     }).catch(function (err) {
       callback(err);
     });
+  },
+
+  updateCamera: function (updatedCamera, callback) {
+    configDocument.mutate(function (remoteData) {
+      if (updatedCamera.id in remoteData.cameras) {
+        remoteData.cameras[updatedCamera.id] = updatedCamera;
+      } else {
+        callback("Camera is not in the list");
+      }
+      return remoteData;
+    }).then(function () {
+      loadCameras();
+      callback(null);
+      callbacks.refresh();
+    }).catch(function (err) {
+      callback(err);
+    });   
   },
 
   deleteCamera: function (cameraId) {
