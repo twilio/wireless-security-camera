@@ -18,7 +18,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="camera in cameras">
+          <tr ng-repeat="camera in cameras" ng-class="{'text-success': cameraAdded.info.id === camera.info.id}">
             <td>{{ camera.id }}</td>
             <td>{{ camera.info.name }}</td>
             <td>{{ camera.info.contact_number }}</td>

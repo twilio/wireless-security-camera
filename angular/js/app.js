@@ -18,6 +18,32 @@ module.exports = function(callbacks) {
 
   var cameras = {};
 
+  function fetchTmpUrl(camera) {
+    $.ajax({
+      type: "GET",
+      url: camera.snapshot.mcs_url,
+      dataType: 'json',            
+      beforeSend: function (xhr) { xhr.setRequestHeader('X-Twilio-Token', app.getToken()); },
+      success: function (data, status, xhr) {
+        camera.snapshot.img_url = data.links.content_direct_temporary;
+        callbacks.refresh();        
+      }
+    });
+  }
+
+  function fetchSnapshot(camera) {
+    syncClient.document(CAMERA_SNAPSHOT_DOCUMENT_NAME(camera.info.id)).then(function (doc) {
+      camera.snapshotDocument = doc;
+      camera.snapshot = doc.value;
+      fetchTmpUrl(camera);
+      doc.on("updated", function (data) {
+        console.log("camera snapshot updated", cameraId, data);
+        camera.snapshot = data;
+        fetchTmpUrl(camera);
+      });
+    });
+  }
+
   function loadCameras() {
     var invalidCameras = [];
 
@@ -40,18 +66,7 @@ module.exports = function(callbacks) {
             id: cameraId,
             info: camera
           };
-          (function (camera) {
-            syncClient.document(CAMERA_SNAPSHOT_DOCUMENT_NAME(cameraId)).then(function (doc) {
-              camera.snapshotDocument = doc;
-              camera.snapshot = doc.value;
-              callbacks.refresh();
-              doc.on("updated", function (data) {
-                console.log("camera snapshot updated", cameraId, data);
-                camera.snapshot = data;
-                callbacks.refresh();
-              });
-            })
-          })(cameras[cameraId]);
+          fetchSnapshot(cameras[cameraId]);
         }
       } else {
         console.warn("Invalid camera configuration, removing from the list: ", cameraId, camera);
