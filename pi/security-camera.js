@@ -7,11 +7,12 @@ const SyncClient = require('twilio-sync');
 const RaspiCam = require("raspicam");
 const CV = require('opencv');
 
-const cameraId = 'DExx';
+const cameraId = 'your-camera-id';
+const cameraPin = '12345';
 const presenceRefereshInterval = 10000; // in milliseconds
 
 let clientToken;
-let clientBootstrapUrl = 'https://yourdomain.twil.io/bootstrap?identity=';
+let clientBootstrapUrl = 'https://your-domain.twil.io/authenticate';
 let imageUploadUrl;
 
 let cameraSnapshot;
@@ -28,21 +29,21 @@ let captureSettings = {
   awb: 'cloud',
   output: '/tmp/camera%02d.jpg',
   q: 80,
-  rot: 0,
+  rot: 180,
   nopreview: true,
-  timeout: 60000,
-  timelapse: 500,
+  timeout: 600000,
+  timelapse: 200,
   th: "0:0:0"
 };
 
 let capturer = new RaspiCam(captureSettings);
 let previousImage;
 
-function bootstrapClient(identity) {
+function bootstrapClient(cameraId) {
   return new Promise(resolve => {
-    request(clientBootstrapUrl + cameraId, function(err, res) {
+    request(clientBootstrapUrl + '?username=' + cameraId + '&pincode=' + cameraPin, (err, res) => {
       let response = JSON.parse(res.body);
-      console.log('Got configuration for identity:', response.identity);
+      console.log('Got configuration for username:', response.username);
       if (err) {
         throw new Error(res.text);
       }
@@ -126,7 +127,7 @@ capturer.on("exit", function(timestamp) {
   capturer.stop();
 });
 
-bootstrapClient()
+bootstrapClient(cameraId)
   .then(function(config) {
     imageUploadUrl = config.upload_url;
     clientToken = config.token;
@@ -137,11 +138,11 @@ bootstrapClient()
       console.log('Camera presense map:', map.sid);
       refreshPresence(map);
     });
-    client.document(cameraId + '.snapshot').then(doc => {
+    client.document('cameras.' + cameraId + '.snapshot').then(doc => {
       console.log('Snapshot document:', doc.sid);
       cameraSnapshot = doc;
     });
-    client.document(cameraId + '.control').then(doc => {
+    client.document('cameras.' + cameraId + '.control').then(doc => {
       console.log('Control document:', doc.sid);
       updateCameraState(doc.value);
       doc.on('updated', value => {
@@ -149,7 +150,7 @@ bootstrapClient()
         updateCameraState(value);
       });
     });
-    client.list(cameraId + '.alerts').then(list => {
+    client.list('cameras.' + cameraId + '.alerts').then(list => {
       console.log('Alert list:', list.sid);
       cameraAlerts = list;
     });
