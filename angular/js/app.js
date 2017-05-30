@@ -1,12 +1,16 @@
 'use strict';
 
+const APP_CONFIGURATION_DOCUMENT_NAME = "app.configuration";
+function CAMERA_SNAPSHOT_DOCUMENT_NAME(cameraId) { return "cameras." + cameraId + ".snapshot"; }
+function CAMERA_CONTROL_DOCUMENT_NAME(cameraId) { return "cameras." + cameraId + ".control"; }
+function CAMERA_ALERTS_LIST_NAME(cameraId) { return "cameras." + cameraId + ".list"; }
 const MOMENT_FORMAT = "MMM DD YYYY @ hh:mm";
 
 var moment = require("moment");
 
 module.exports = function(callbacks) {
-  var $ = require("jquery");
-  var SyncClient = require("twilio-sync").SyncClient;
+  const $ = require("jquery");
+  const SyncClient = require("twilio-sync").SyncClient;
   var syncClient;
   var token;
   var auth = "username=trump&pincode=928462";
@@ -17,18 +21,50 @@ module.exports = function(callbacks) {
   function loadCameras() {
     var invalidCameras = [];
 
-    for (var member in cameras) delete cameras[member];
     for (var cameraId in configDocument.value.cameras) {
       var camera = configDocument.value.cameras[cameraId];
-      if (typeof (camera.name) === "string") {
-        console.log("Loaded camera", camera);
-        cameras[cameraId] = {
-          id: cameraId,
-          info: camera
-        };
+      if (camera.id === cameraId &&
+          typeof (camera.name) === "string" &&
+          typeof(camera.contact_number) === "string" &&
+          typeof(camera.twilio_sim_sid) === "string") {
+        if (cameraId in cameras) {
+          if (camera.name !== cameras[cameraId].info.name ||
+              camera.contact_number !== cameras[cameraId].info.contact_number ||
+              camera.twilio_sim_sid !== cameras[cameraId].info.twilio_sim_sid) {
+            console.log("Updating camera", camera);
+            cameras[cameraId].info = camera;
+          }
+        } else {
+          console.log("Loading new camera", camera);
+          cameras[cameraId] = {
+            id: cameraId,
+            info: camera
+          };
+          (function (camera) {
+            syncClient.document(CAMERA_SNAPSHOT_DOCUMENT_NAME(cameraId)).then(function (doc) {
+              camera.snapshotDocument = doc;
+              camera.snapshot = doc.value;
+              callbacks.refresh();
+              doc.on("updated", function (data) {
+                console.log("camera snapshot updated", cameraId, data);
+                camera.snapshot = data;
+                callbacks.refresh();
+              });
+            })
+          })(cameras[cameraId]);
+        }
       } else {
         console.warn("Invalid camera configuration, removing from the list: ", cameraId, camera);
         invalidCameras.push(cameraId);
+      }
+    }
+    for (var cameraId in cameras) {
+      if (!(cameraId in configDocument.value.cameras)) {
+        console.log("Deleting camera", camera);
+        if (cameras[cameraId].snapshotDocument) {
+          cameras[cameraId].snapshotDocument.removeAllListeners('updated');
+        }
+        delete cameras[cameraId];
       }
     }
 
@@ -61,7 +97,7 @@ module.exports = function(callbacks) {
   },
 
   fetchConfiguration: function () {
-    syncClient.document("app.configuration").then(function (doc) {
+    syncClient.document(APP_CONFIGURATION_DOCUMENT_NAME).then(function (doc) {
       configDocument = doc;
       var newDoc = null;
       var invalidCameras;
@@ -81,8 +117,8 @@ module.exports = function(callbacks) {
       }
 
       if (newDoc !== null) {
-        doc.update(newDoc).then(function () {
-            console.log("app configuration updated with new value:", newDoc);
+        doc.set(newDoc).then(function () {
+          console.log("app configuration updated with new value:", newDoc);
         });
       }
 
@@ -95,6 +131,7 @@ module.exports = function(callbacks) {
     if (!newCamera.name) return callback("camera name is not specified");
     if (!newCamera.contact_number || !newCamera.contact_number.match(/^[0-9]+$/)) return callback("camera contact number is invalid(only digits allowed): " + newCamera.contact_number);
     if (!newCamera.twilio_sim_sid || !newCamera.twilio_sim_sid.match(/^DE[a-z0-9]{32}$/)) return callback("camera sim SID is invalid: " + newCamera.twilio_sim_sid);
+    if (newCamera.id in configDocument.value.cameras) return callback("Camera with the same ID exists");
     newCamera.created_at = moment().format(MOMENT_FORMAT);
 
     configDocument.mutate(function (remoteData) {
@@ -118,6 +155,10 @@ module.exports = function(callbacks) {
       loadCameras();
       callbacks.refresh();    
     });
+  },
+
+  getToken: function () {
+    return token;
   },
 
   init: function () {

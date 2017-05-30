@@ -5,11 +5,11 @@
 <div ng-repeat="camera in cameras" class="jumbotron camera camera{{ camera.info.id }}">
   <h3>
     {{ camera.info.name }}
-    <a href="#!/camera/{{ camera.id }}">(see past images)</a>
+    <a href="#!/cameras/{{ camera.id }}">(see past images)</a>
   </h3>
   <div class="row">
     <div class="col-lg-8 col-lg-offset-2 img-parent">
-      <img class="camera-feed" ng-src="/imgs/camera_photos/{{ camera.motion.image_name }}" />
+      <img class="camera-feed" ng-src="{{ camera.snapshot.img_url }}" />
     </div>
   </div>
   <div class="row motion_stats">

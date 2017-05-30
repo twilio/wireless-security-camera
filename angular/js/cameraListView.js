@@ -19,6 +19,8 @@ var cameraListView = {
   },
 
   onCameraAdded: function () {
+      $('.add-camera').hide();
+      $('.add-camera-show').fadeIn(333);
   },
 };
 

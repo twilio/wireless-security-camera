@@ -31,6 +31,7 @@ exports.handler = function(context, event, callback) {
     success: true,
     username: username,
     service_sid: context.SERVICE_SID,
+    upload_url: "https://mcs.us1.twilio.com/v1/Services/" + context.SERVICE_SID + "/Media",
     ttl: context.TOKEN_TTL,
     token: token.toJwt()
   });

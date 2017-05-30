@@ -1,5 +1,6 @@
 'use strict';
 
+const $ = require("jquery");
 const angular = require("angular");
 const ngRoute = require("angular-route");
 
@@ -18,9 +19,27 @@ var $currentViewScope;
 
 var App = require("./app");
 window.app = new App({
-    refresh: function () {
-        $currentViewScope.$apply();
+  refresh: function () {
+    $currentViewScope.$apply();
+    // update snapshot tmp urls
+    for (var cameraId in app.cameras) {
+      var camera = app.cameras[cameraId];
+      if (camera.snapshot && !camera.snapshot.img_url) {
+        (function (camera) {
+          $.ajax({
+            type: "GET",
+            url: camera.snapshot.mcs_url,
+            dataType: 'json',            
+            beforeSend: function (xhr) { xhr.setRequestHeader('X-Twilio-Token', app.getToken()); },
+            success: function (data, status, xhr) {
+              camera.snapshot.img_url = data.links.content_direct_temporary;
+              $currentViewScope.$apply();          
+            }
+          });
+        })(camera);
+      }
     }
+  }
 });
 
 angular
