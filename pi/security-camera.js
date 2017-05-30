@@ -90,7 +90,7 @@ function uploadImage(file, token) {
       if (err) {
         throw new Error(res.text);
       }
-      resolve(response);
+      resolve({ media: response, location: res.headers.location });
     });
   });
 }
@@ -100,11 +100,11 @@ capturer.on("read", function(err, timeStamp, fileName) {
   if (!fileName.endsWith('~')) {
     let filePath = '/tmp/' + fileName;
     uploadImage(filePath, clientToken).then(res => {
-      console.log('Uploaded:', res.sid, res.links.content);
+      console.log('Uploaded:', res.media.sid, res.location);
       cameraSnapshot.set({
-        date_updated: new Date().toUTCString(),
-        image_sid: res.sid,
-        image_url: res.links.content
+        date_captured: new Date(timeStamp).toUTCString(),
+        mcs_sid: res.media.sid,
+        mcs_url: res.location
       });
     });
     CV.readImage(filePath, (err, im) => {
@@ -112,9 +112,11 @@ capturer.on("read", function(err, timeStamp, fileName) {
       if (previousImage && im.width() > 1 && im.height() > 1) {
         CV.ImageSimilarity(im, previousImage, function (err, dissimilarity) {
           console.log('Dissimilarity:', dissimilarity);
+          previousImage = im;
         });
+      } else {
+        previousImage = im;
       }
-      previousImage = im;
     });
   }
 });
