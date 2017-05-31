@@ -1,12 +1,19 @@
 const AccessToken = Twilio.jwt.AccessToken;
 const SyncGrant = AccessToken.SyncGrant;
 
+
+function userAuth(context, username, pincode) {
+  var pincodes = JSON.parse(context.USER_PINCODES);
+  return pincodes[username] === pincode;
+}
+
 exports.handler = function(context, event, callback) {
   let username = event.username;
   let pincode = event.pincode;
 
   if (!username) return callback(null, { success: false, error: "username is not defined in event" });
   if (!pincode) return callback(null, { success: false, error: "pincode is not defined in event" });
+  if (!userAuth(context, username, pincode)) return callback(null, { success: false, error: "username or token provided is invalid" });
 
   // Create a "grant" which enables a client to use Sync as a given user,
   // on a given device
@@ -18,9 +25,9 @@ exports.handler = function(context, event, callback) {
   // containing the grant we just created
   let token = new AccessToken(
     context.ACCOUNT_SID,
-    context.API_KEY,
+    context.AUTH_TOKEN,
     context.API_SECRET, {
-        ttl : parseInt(context.TOKEN_TTL) // int and string are different for AccessToken
+      ttl : parseInt(context.TOKEN_TTL) // int and string are different for AccessToken
     }
   );
   token.addGrant(syncGrant);
@@ -31,7 +38,6 @@ exports.handler = function(context, event, callback) {
     success: true,
     username: username,
     service_sid: context.SERVICE_SID,
-    upload_url: "https://mcs.us1.twilio.com/v1/Services/" + context.SERVICE_SID + "/Media",
     ttl: context.TOKEN_TTL,
     token: token.toJwt()
   });

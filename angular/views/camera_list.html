@@ -18,12 +18,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="camera in cameras" ng-class="{'text-success': cameraAdded.info.id === camera.info.id || editedCameraInfo.id === camera.info.id}">
+          <tr ng-repeat="camera in cameras" ng-class="{'text-success': editedCameraInfo.id === camera.info.id}">
             <td>{{ camera.info.id }}</td>
             <td>{{ camera.info.name }}</td>
             <td>{{ camera.info.contact_number }}</td>
             <td>{{ camera.info.twilio_sim_sid }}</td>
-            <td>{{ camera.info.token }}</td>
+            <td>
+                <small ng-if="editedCameraInfo.id === camera.info.id" class="text-warning">{{ editedCameraInfo.token }}</small>
+                <button ng-click="regenTokenForCamera(camera.info.id)" ng-if="editedCameraInfo.id !== camera.info.id" class="btn btn-xs btn-success">Regenerate</button>
+            </td>
             <td>{{ camera.info.created_at }}</td>
             <td>
                 <button ng-click="editCamera(camera.info.id)" class="btn btn-xs btn-success">Edit</button>

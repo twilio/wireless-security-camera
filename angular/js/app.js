@@ -10,6 +10,7 @@ var moment = require("moment");
 
 module.exports = function(callbacks) {
   const $ = require("jquery");
+  const crypto = require("crypto");
   const SyncClient = require("twilio-sync").SyncClient;
   var syncClient;
   var token;
@@ -17,6 +18,16 @@ module.exports = function(callbacks) {
   var configDocument;
 
   var cameras = {};
+
+  function randomString(len) {
+      var charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      var randomString = '';
+      for (var i = 0; i < len; i++) {
+          var randomPoz = Math.floor(Math.random() * charSet.length);
+          randomString += charSet.substring(randomPoz,randomPoz+1);
+      }
+      return randomString;
+  }
 
   function fetchTmpUrl(camera) {
     $.ajax({
@@ -37,7 +48,7 @@ module.exports = function(callbacks) {
       camera.snapshot = doc.value;
       fetchTmpUrl(camera);
       doc.on("updated", function (data) {
-        console.log("camera snapshot updated", cameraId, data);
+        console.log("camera snapshot updated", camera.info.id, data);
         camera.snapshot = data;
         fetchTmpUrl(camera);
       });
@@ -86,11 +97,17 @@ module.exports = function(callbacks) {
   }
 
   function cameraInfoCheck(camera, callback) {
-    if (!newCamera.id || !newCamera.id.match(/^[a-zA-Z0-9]+$/))  { callback("camera id is invalid: " + newCamera.id); return false; }
-    if (!newCamera.name) { callback("camera name is not specified"); return false; }
-    if (!newCamera.contact_number || !newCamera.contact_number.match(/^[0-9]+$/)) { callback("camera contact number is invalid(only digits allowed): " + newCamera.contact_number); return false; }
-    if (!newCamera.twilio_sim_sid || !newCamera.twilio_sim_sid.match(/^DE[a-z0-9]{32}$/)) { callback("camera sim SID is invalid: " + newCamera.twilio_sim_sid); return false; }
+    if (!camera.id || !camera.id.match(/^[a-zA-Z0-9]+$/))  { callback("camera id is invalid: " + newCamera.id); return false; }
+    if (!camera.name) { callback("camera name is not specified"); return false; }
+    if (!camera.contact_number || !camera.contact_number.match(/^[0-9]+$/)) { callback("camera contact number is invalid(only digits allowed): " + newCamera.contact_number); return false; }
+    if (!camera.twilio_sim_sid || !camera.twilio_sim_sid.match(/^DE[a-z0-9]{32}$/)) { callback("camera sim SID is invalid: " + newCamera.twilio_sim_sid); return false; }
     return true;
+  }
+
+  function genToken() {
+    var token = randomString(16);
+    var hash = crypto.createHash('sha512').update(token).digest("hex");
+    return { token: token, hash: hash };
   }
 
   return {
@@ -98,7 +115,7 @@ module.exports = function(callbacks) {
 
   updateToken: function (cb) {
     var that = this;
-    return $.get("/authenticate?" + auth, function (result) {
+    return $.get("/userauthenticate?" + auth, function (result) {
       if (result.success) {
         console.log("token updated:", result);
         token = result.token;
@@ -153,14 +170,18 @@ module.exports = function(callbacks) {
     if (newCamera.id in configDocument.value.cameras) return callback("Camera with the same ID exists");
     newCamera.created_at = moment().format(MOMENT_FORMAT);
 
+    var t = genToken();
+    newCamera.hash = t.hash;
+
     configDocument.mutate(function (remoteData) {
       if (!remoteData.cameras) remoteData.cameras = {};
       remoteData.cameras[newCamera.id] = newCamera;
       return remoteData;
     }).then(function () {
       loadCameras();
-      callback(null, cameras[newCamera.id]);
-      callbacks.refresh();    
+      // make token temporarily visible
+      callback(null, $.extend(true, cameras[newCamera.id].info, { token: t.token }));
+      callbacks.refresh();
     }).catch(function (err) {
       callback(err);
     });
@@ -169,7 +190,9 @@ module.exports = function(callbacks) {
   updateCamera: function (updatedCamera, callback) {
     configDocument.mutate(function (remoteData) {
       if (updatedCamera.id in remoteData.cameras) {
-        remoteData.cameras[updatedCamera.id] = updatedCamera;
+        remoteData.cameras[updatedCamera.id] = $.extend(true, updatedCamera, {
+            hash: remoteData.cameras[updatedCamera.id].hash
+          });
       } else {
         callback("Camera is not in the list");
       }
@@ -181,6 +204,26 @@ module.exports = function(callbacks) {
     }).catch(function (err) {
       callback(err);
     });   
+  },
+
+  regenToken: function (cameraId, callback) {
+    var t = genToken();
+    configDocument.mutate(function (remoteData) {
+      if (cameraId in remoteData.cameras) {
+        remoteData.cameras[cameraId].hash = t.hash;
+      } else {
+        throw "unknown camera: " + cameraId;
+      }
+      return remoteData;
+    }).then(function () {
+      loadCameras();
+      // make token temporarily visible
+      callback($.extend(true, cameras[cameraId].info, { token: t.token }));
+      callbacks.refresh();
+    }).catch(function (err) {
+      // ignore error
+      console.error("regenToken", err);
+    });
   },
 
   deleteCamera: function (cameraId) {

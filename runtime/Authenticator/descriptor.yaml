@@ -1,6 +1,0 @@
-name: Authenticator
-type: function
-path: /authenticate
-description: |
-  Generate short-term jwt token for cameras to access twilio services
-script: Authenticator.js

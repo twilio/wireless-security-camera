@@ -11,7 +11,7 @@ var cameraListView = {
         if (err) {
           $('#add-camera-failed').text(JSON.stringify(err));          
         } else {
-          $scope.cameraAdded = cameraAdded;
+          $scope.editedCameraInfo = cameraAdded;
           $('.add-camera').hide();
           $('.add-camera-show').fadeIn(333);          
           $scope.$apply();
@@ -27,7 +27,6 @@ var cameraListView = {
         if (err) {
           $('#edit-camera-failed').text(JSON.stringify(err));          
         } else {
-          $scope.editedCameraInfo = null;
           $('.edit-camera').hide();
           $scope.$apply();
         }
@@ -35,6 +34,11 @@ var cameraListView = {
     };
     $scope.deleteCamera = function (cameraId) {
       app.deleteCamera(cameraId);
+    };
+    $scope.regenTokenForCamera = function (cameraId) {
+      app.regenToken(cameraId, function (cameraUpdated) {
+        $scope.editedCameraInfo = cameraUpdated;
+      });
     };
 
     $('.add-camera-show').click(function() {
