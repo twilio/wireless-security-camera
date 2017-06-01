@@ -31,7 +31,7 @@ let captureSettings = {
   rot: 180,
   nopreview: true,
   timeout: 600000,
-  timelapse: 200,
+  timelapse: 300,
   th: "0:0:0"
 };
 
@@ -109,10 +109,9 @@ capturer.on("read", function(err, timeStamp, fileName) {
           previousImage = im;
 
           let changesDetected = dissimilarity > 0; // silly change detector
-          // upload the image either if the preview is enabled
-          // or the image has artifacts and an unresponded alarm is pending
           if (statePreviewing || changesDetected || pendingAlarm != respondedAlarm) {
-
+            // upload the image either if the preview is enabled
+            // or the image has artifacts and an unresponded alarm is pending
             uploadImage(filePath, config.token).then(res => {
               console.log('Uploaded:', res.media.sid, res.location);
               cameraSnapshot.set({
