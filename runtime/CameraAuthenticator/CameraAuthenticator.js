@@ -34,11 +34,10 @@ exports.handler = function(context, event, callback) {
   token.identity = camera_id;
 
   // verify camera token
-  let client = Twilio(context.API_KEY, context.API_SECRET, { accountSid : context.ACCOUNT_SID } );
+  let client = context.getTwilioClient();
   let syncService = client.sync.services(context.SERVICE_SID);
   syncService.documents("app.configuration").fetch()
   .then(function (configDocument) {
-
     let config = configDocument.data;
     if (cameraAuth(config.cameras, camera_id, camera_token)) {
       // Serialize the token to a JWT string and include it in a JSON response
@@ -53,7 +52,9 @@ exports.handler = function(context, event, callback) {
         },
         sync_objects: {
           camera_snapshot_document: "cameras." + camera_id + ".snapshot",
-          camera_control_document: "cameras." + camera_id + ".control"
+          camera_control_map: "cameras." + camera_id + ".control",
+          camera_alerts_list: "cameras." + camera_id + ".alerts",
+          camera_archives_list_prefix: "cameras." + camera_id + ".archives."
         }
       });
     } else {

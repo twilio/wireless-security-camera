@@ -1,6 +1,6 @@
 name: AlertGenerator
+type: function
+path: /alertgenerator
 description: |
-  Generate alerts according to incoming frames.
-path: /alert_generator
+  Generate alerts according to incoming snapshots.
 script: AlertGenerator.js
-context:

@@ -2,8 +2,8 @@
 
 const APP_CONFIGURATION_DOCUMENT_NAME = "app.configuration";
 function CAMERA_SNAPSHOT_DOCUMENT_NAME(cameraId) { return "cameras." + cameraId + ".snapshot"; }
-function CAMERA_CONTROL_DOCUMENT_NAME(cameraId) { return "cameras." + cameraId + ".control"; }
-function CAMERA_ALERTS_LIST_NAME(cameraId) { return "cameras." + cameraId + ".list"; }
+function CAMERA_CONTROL_MAP_NAME(cameraId) { return "cameras." + cameraId + ".control"; }
+function CAMERA_ALERTS_LIST_NAME(cameraId) { return "cameras." + cameraId + ".alerts"; }
 const MOMENT_FORMAT = "MMM DD YYYY @ hh:mm";
 
 var moment = require("moment");
@@ -37,7 +37,7 @@ module.exports = function(callbacks) {
       beforeSend: function (xhr) { xhr.setRequestHeader('X-Twilio-Token', app.getToken()); },
       success: function (data, status, xhr) {
         camera.snapshot.img_url = data.links.content_direct_temporary;
-        callbacks.refresh();        
+        callbacks.refresh();
       }
     });
   }
@@ -48,9 +48,33 @@ module.exports = function(callbacks) {
       camera.snapshot = doc.value;
       fetchTmpUrl(camera);
       doc.on("updated", function (data) {
-        console.log("camera snapshot updated", camera.info.id, data);
+        console.log("camera snapshot updated", camera.info.id, JSON.stringify(data));
         camera.snapshot = data;
         fetchTmpUrl(camera);
+      });
+    });
+  }
+
+  function fetchControl(camera) {
+    syncClient.map(CAMERA_CONTROL_MAP_NAME(camera.info.id)).then(function (map) {
+      Promise.all([
+        map.get("preview"),
+        map.get("alarm"),
+        map.get("arm")
+      ]).then(function (items) {
+        camera.controlMap = map;
+        camera.control = {
+          preview : items[0].value,
+          alarm : items[1].value,
+          arm : items[2].value,
+        };
+        console.log("camera control fetched", camera.info.id, JSON.stringify(camera.control));
+        map.on("itemUpdated", function (data) {
+          console.log("camera control updated", camera.info.id, data.key, JSON.stringify(data.value));
+          camera.control[data.key] = data.value;
+          callbacks.refresh(); 
+        });
+        callbacks.refresh(); 
       });
     });
   }
@@ -77,6 +101,7 @@ module.exports = function(callbacks) {
             info: camera
           };
           fetchSnapshot(cameras[cameraId]);
+          fetchControl(cameras[cameraId]);
         }
       } else {
         console.warn("Invalid camera configuration, removing from the list: ", cameraId, camera);
@@ -88,6 +113,9 @@ module.exports = function(callbacks) {
         console.log("Deleting camera", camera);
         if (cameras[cameraId].snapshotDocument) {
           cameras[cameraId].snapshotDocument.removeAllListeners('updated');
+        }
+        if (cameras[cameraId].controlMap) {
+          cameras[cameraId].controlMap.removeAllListeners('itemUpdated');
         }
         delete cameras[cameraId];
       }
@@ -178,6 +206,18 @@ module.exports = function(callbacks) {
       remoteData.cameras[newCamera.id] = newCamera;
       return remoteData;
     }).then(function () {
+      // create necessary objects
+      return Promise.all([
+        syncClient.map(CAMERA_CONTROL_MAP_NAME(newCamera.id)).then(function (controlMap) {
+          return Promise.all[
+            controlMap.set('alarm', { id: -1 }),
+            controlMap.set('arm', { enabled: true, responded_alarm: -1}),
+            controlMap.set('preview', { enabled : false })
+          ];
+        }),
+        syncClient.list(CAMERA_ALERTS_LIST_NAME(newCamera.id)),
+      ]);
+    }).then(function () {
       loadCameras();
       // make token temporarily visible
       callback(null, $.extend(true, cameras[newCamera.id].info, { token: t.token }));
@@ -233,6 +273,42 @@ module.exports = function(callbacks) {
     }).then(function () {
       loadCameras();
       callbacks.refresh();    
+    }).then(function () {
+      syncClient.map(CAMERA_CONTROL_MAP_NAME(cameraId)).then(function (map) { map.removeMap(); });
+      syncClient.list(CAMERA_ALERTS_LIST_NAME(cameraId)).then(function (list) { list.removeList(); });
+    });
+  },
+
+  controlPreview: function (cameraId) {
+    var camera = cameras[cameraId];
+    camera.controlMap.set("preview", camera.control.preview)
+    .then(function () {
+      console.log("switchPreview updated", cameraId, camera.control.preview);
+    }).catch(function (err) {
+      console.err("switchPreview failed", err);
+    });
+  },
+
+  controlArm: function (cameraId) {
+    var camera = cameras[cameraId];
+    camera.controlMap.set("arm", camera.control.arm)
+    .then(function () {
+      console.log("switchArm updated", cameraId, camera.control.arm);
+    }).catch(function (err) {
+      console.err("switchArm failed", err);
+    });
+  },
+
+  disarm: function (cameraId) {
+    var camera = cameras[cameraId];
+    camera.controlMap.set("arm", {
+      enabled: camera.control.arm.enabled,
+      responded_alarm: camera.control.alarm.id
+    })
+    .then(function () {
+      console.log("disarm updated", cameraId, camera.control.arm);
+    }).catch(function (err) {
+      console.err("disarm failed", err);
     });
   },
 

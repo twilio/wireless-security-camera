@@ -5,7 +5,9 @@
 <div ng-repeat="camera in cameras" class="jumbotron camera camera{{ camera.info.id }}">
   <h3>
     {{ camera.info.name }}
-    <a href="#!/cameras/{{ camera.id }}">(see past images)</a>
+    <a href="#!/cameras/{{ camera.info.id }}">(Browse archived alarms)</a>
+    <small><input type="checkbox" ng-model="camera.control.preview.enabled" ng-change="switchPreview(camera.info.id)">(Preview)</small>
+    <small><input type="checkbox" ng-model="camera.control.arm.enabled" ng-change="switchArm(camera.info.id)">(Armed)</small>
   </h3>
   <div class="row">
     <div class="col-lg-8 col-lg-offset-2 img-parent">
@@ -14,9 +16,12 @@
   </div>
   <div class="row motion_stats">
     <div class="col-lg-4 col-lg-offset-4">
-      <div class="alert alert-dismissible alert-success">
-        <strong>No People detected</strong>
+      <div class="alert alert-success" ng-if="camera.control.alarm.id === camera.control.arm.responded_alarm">
+        <strong>No Active Alarm</strong>
       </div>
+      <button class="alert alert-danger" ng-if="camera.control.alarm.id !== camera.control.arm.responded_alarm" ng-click="disarm(camera.info.id)">
+        <strong>Alarm is ON!</strong> <small>(click to disarm)</small>
+      </button>
     </div>
   </div>
 </div>
