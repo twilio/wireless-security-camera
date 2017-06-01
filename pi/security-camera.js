@@ -3,15 +3,17 @@
 const fs = require('fs');
 const request = require('request');
 
+const TwilioCommon = require('twilio-common');
 const SyncClient = require('twilio-sync');
 const RaspiCam = require("raspicam");
 const CV = require('opencv');
 
 const cameraId = 'your-camera-id';
-const cameraPin = 'your-camera-token';
+const cameraSecret = 'your-camera-secret';
+const clientBootstrapUrl = 'https://your-domain.twil.io/cameraauthenticate';
 
+let accessManager;
 let config;
-let clientBootstrapUrl = 'https://your-domain.twil.io/cameraauthenticate';
 
 let cameraSnapshot;
 let stateCapturing = false;
@@ -22,30 +24,24 @@ let pendingAlarm = -1;
 let respondedAlarm = -1;
 
 let captureSettings = {
-  width: 640,
-  height: 360,
+  width: 640, height: 360,
   mode: "timelapse",
   awb: 'cloud',
   output: '/tmp/camera%02d.jpg',
-  q: 80,
-  rot: 180,
+  q: 80, rot: 180, th: '0:0:0',
   nopreview: true,
-  timeout: 600000,
-  timelapse: 300,
-  th: "0:0:0"
+  timeout: 1800000,  // camera runs for 30 minutes by default
+  timelapse: 250     // camera runs at roughly 4 fps
 };
 
 let capturer = new RaspiCam(captureSettings);
 let previousImage;
 
-function bootstrapClient(cameraId) {
+function bootstrapClient(id, secret) {
   return new Promise(resolve => {
-    request(clientBootstrapUrl + '?camera_id=' + cameraId + '&camera_token=' + cameraPin, (err, res) => {
+    request(clientBootstrapUrl + '?camera_id=' + id + '&camera_token=' + secret, (err, res) => {
       let response = JSON.parse(res.body);
       console.log('Got configuration for camera:', response.camera_id);
-      if (err) {
-        throw new Error(res.text);
-      }
       resolve(response);
     });
   });
@@ -135,7 +131,7 @@ capturer.on("exit", function(timestamp) {
   capturer.stop();
 });
 
-bootstrapClient(cameraId)
+bootstrapClient(cameraId, cameraSecret)
   .then(function(cfg) {
     config = cfg;
     return new SyncClient(config.token);
@@ -160,6 +156,15 @@ bootstrapClient(cameraId)
         console.log('Remote control:', item.key, item.value);
         updateCameraState(item);
       });
+    });
+    accessManager = new TwilioCommon.AccessManager(config.token);
+    accessManager.on('tokenUpdated', am => {
+      config.token = am.token;
+      client.updateToken(am.token);
+    });
+    accessManager.on('tokenExpired', () => {
+      bootstrapClient(cameraId, cameraSecret)
+        .then(cfg => accessManager.updateToken(cfg.token));
     });
   })
   .catch(function(error) {
