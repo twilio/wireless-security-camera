@@ -6,8 +6,8 @@
   <h3>
     {{ camera.info.name }}
     <a href="#!/cameras/{{ camera.info.id }}">(Browse archived alarms)</a>
-    <small><input type="checkbox" ng-model="camera.control.preview.enabled" ng-change="switchPreview(camera.info.id)">(Preview)</small>
-    <small><input type="checkbox" ng-model="camera.control.arm.enabled" ng-change="switchArm(camera.info.id)">(Armed)</small>
+    <small><input type="checkbox" ng-model="camera.control.preview.enabled" ng-change="switchPreview(camera.info.id)">Preview</small>
+    <small><input type="checkbox" ng-model="camera.control.arm.enabled" ng-change="switchArm(camera.info.id)">Armed</small>
   </h3>
   <div class="row">
     <div class="col-lg-8 col-lg-offset-2 img-parent">
@@ -20,7 +20,7 @@
         <strong>No Active Alarm</strong>
       </div>
       <button class="alert alert-danger" ng-if="camera.control.alarm.id !== camera.control.arm.responded_alarm" ng-click="disarm(camera.info.id)">
-        <strong>Alarm is ON!</strong> <small>(click to disarm)</small>
+        <strong>Dismiss Alarm</strong>
       </button>
     </div>
   </div>

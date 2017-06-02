@@ -27,7 +27,7 @@
                 <small ng-if="editedCameraInfo.id === camera.info.id" class="text-warning">{{ editedCameraInfo.token }}</small>
                 <button ng-click="regenTokenForCamera(camera.info.id)" ng-if="editedCameraInfo.id !== camera.info.id" class="btn btn-xs btn-success">Regenerate</button>
             </td>
-            <td>{{ camera.info.created_at }}</td>
+            <td>{{ camera.info.created_at | moment }}</td>
             <td>
                 <button ng-click="editCamera(camera.info.id)" class="btn btn-xs btn-success">Edit</button>
                 &nbsp;

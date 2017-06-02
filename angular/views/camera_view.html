@@ -1,0 +1,14 @@
+<h1>{{ camera.info.name }}</h1>
+
+<div class="alerts-list">
+  <h2>Alerts: </h2>
+  <select class="form-control" id="alertSelect" ng-model="selectedAlertId" ng-change="selectedAlertChanged()">
+    <option ng-repeat="alert in alerts" value="{{alert.data.index}}">{{alert.data.index}} : {{alert.data.value.datetime_utc | moment}}</option>
+  </select>
+</div>
+
+<div class="archive-view row">
+  <button class="btn btn-primary col-lg-2 pull-left" ng-click="selectPreviousArchive()">&lt;</button>
+  <img class="col-lg-offset-2 col-lg-8 camera-feed" ng-src="{{ snapshotTmpUrl }}"/>
+  <button class="btn btn-primary col-lg-2 pull-right" ng-click="selectNextArchive()">&gt;</button>
+</div>

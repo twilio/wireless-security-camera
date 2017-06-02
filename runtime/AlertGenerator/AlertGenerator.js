@@ -33,6 +33,7 @@ exports.handler = function(context, event, callback) {
                         .syncLists(camera_alerts_list)
                         .syncListItems.create({
                             data: {
+                                datetime_utc: (new Date()).getTime(),
                                 reason: "changes_detected"
                             }
                         })

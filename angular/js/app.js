@@ -4,9 +4,7 @@ const APP_CONFIGURATION_DOCUMENT_NAME = "app.configuration";
 function CAMERA_SNAPSHOT_DOCUMENT_NAME(cameraId) { return "cameras." + cameraId + ".snapshot"; }
 function CAMERA_CONTROL_MAP_NAME(cameraId) { return "cameras." + cameraId + ".control"; }
 function CAMERA_ALERTS_LIST_NAME(cameraId) { return "cameras." + cameraId + ".alerts"; }
-const MOMENT_FORMAT = "MMM DD YYYY @ hh:mm";
-
-var moment = require("moment");
+function CAMERA_ARCHIVES_LIST_NAME(cameraId, alertId) { return "cameras." + cameraId + ".archives." + alertId; }
 
 module.exports = function(callbacks) {
   const $ = require("jquery");
@@ -29,16 +27,22 @@ module.exports = function(callbacks) {
       return randomString;
   }
 
-  function fetchTmpUrl(camera) {
+  function fetchSnapshotTmpUrl(mcs_url, callback) {
     $.ajax({
       type: "GET",
-      url: camera.snapshot.mcs_url,
+      url: mcs_url,
       dataType: 'json',            
-      beforeSend: function (xhr) { xhr.setRequestHeader('X-Twilio-Token', app.getToken()); },
+      beforeSend: function (xhr) { xhr.setRequestHeader('X-Twilio-Token', token); },
       success: function (data, status, xhr) {
-        camera.snapshot.img_url = data.links.content_direct_temporary;
-        callbacks.refresh();
+        callback(data.links.content_direct_temporary);
       }
+    });
+  }
+
+  function fetchCameraSnapshotTmpUrl(camera) {
+    fetchSnapshotTmpUrl(camera.snapshot.mcs_url, function (snapshotTmpUrl) {
+        camera.snapshot.img_url = snapshotTmpUrl;      
+        callbacks.refresh();        
     });
   }
 
@@ -46,11 +50,11 @@ module.exports = function(callbacks) {
     syncClient.document(CAMERA_SNAPSHOT_DOCUMENT_NAME(camera.info.id)).then(function (doc) {
       camera.snapshotDocument = doc;
       camera.snapshot = doc.value;
-      fetchTmpUrl(camera);
+      fetchCameraSnapshotTmpUrl(camera);
       doc.on("updated", function (data) {
         console.log("camera snapshot updated", camera.info.id, JSON.stringify(data));
         camera.snapshot = data;
-        fetchTmpUrl(camera);
+        fetchCameraSnapshotTmpUrl(camera);
       });
     });
   }
@@ -139,6 +143,8 @@ module.exports = function(callbacks) {
   }
 
   return {
+  initialized: $.Deferred(),
+
   cameras: cameras,
 
   updateToken: function (cb) {
@@ -164,7 +170,7 @@ module.exports = function(callbacks) {
   },
 
   fetchConfiguration: function () {
-    syncClient.document(APP_CONFIGURATION_DOCUMENT_NAME).then(function (doc) {
+    return syncClient.document(APP_CONFIGURATION_DOCUMENT_NAME).then(function (doc) {
       configDocument = doc;
       var newDoc = null;
       var invalidCameras;
@@ -183,20 +189,20 @@ module.exports = function(callbacks) {
         newDoc.cameras = {};
       }
 
+      return newDoc;
+    }).then(function (newDoc) {
       if (newDoc !== null) {
-        doc.set(newDoc).then(function () {
+        return doc.set(newDoc).then(function () {
           console.log("app configuration updated with new value:", newDoc);
         });
       }
-
-      callbacks.refresh();    
     });
   },
 
   addCamera: function (newCamera, callback) {
     if (!cameraInfoCheck(newCamera, callback)) return;
     if (newCamera.id in configDocument.value.cameras) return callback("Camera with the same ID exists");
-    newCamera.created_at = moment().format(MOMENT_FORMAT);
+    newCamera.created_at = (new Date()).getTime();
 
     var t = genToken();
     newCamera.hash = t.hash;
@@ -312,14 +318,38 @@ module.exports = function(callbacks) {
     });
   },
 
-  getToken: function () {
-    return token;
+  getAlerts: function (cameraId, callback) {
+    syncClient.list(CAMERA_ALERTS_LIST_NAME(cameraId)).then(function (list) {
+      return list.getItems({ order: "desc" }).then(function (page) {
+        console.log("getAlerts", page);
+        callback(page.items);
+      });
+    }).catch(function (err) {
+      console.error("getAlerts failed", err);
+    });
+  },
+
+  getNextArchivedSnapshot: function (cameraId, alertId, archiveId, callback) {
+    syncClient.list(CAMERA_ARCHIVES_LIST_NAME(cameraId, alertId)).then(function (list) {
+      return list.get(archiveId);
+    }).then(function (item) {
+      fetchSnapshotTmpUrl(item.data.value.mcs_url, function (snapshotTmpUrl) {
+        callback(snapshotTmpUrl);
+      });
+    }).catch(function (err) {
+      console.info("getNextArchivedSnapshot failed", err);
+      callback(null);
+    });
   },
 
   init: function () {
     var that = this;
     this.updateToken(function (token) {
-      that.fetchConfiguration();
+      that.fetchConfiguration().then(function () {
+        callbacks.refresh();      
+      }).then(function () {
+        that.initialized.resolve();
+      });
     });
   }
   };
