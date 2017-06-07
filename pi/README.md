@@ -3,13 +3,14 @@
 
 You can, technically, do this next step from the Raspberry Pi Zero if you have an internet connection. The 3G modem will work wonders here, if already assembled.
 
-1. Download the Node.js package from the repository: **[security-camera.js](../pi/security-camera.js)**, **[package.json](../pi/package.json)**. (An alternative is to download the files to a USB Flash Drive and transfer it to the Pi.)
-2. Then, **copy our package** (security-camera.js, package.js) onto the Pi. We added it to the "camera" directory /home/pi/camera/.
-3. To run the application, you will need to install the dependent packages, which can be done with NPM. From the terminal’s command line, **type this command:**
+1. Download the Node.js application from the repository: **[security-camera.js](../pi/security-camera.js)**, **[package.json](../pi/package.json)**. (An alternative is to download the files to a USB Flash Drive and transfer them to the Pi.)
+2. Then, **copy our package** (security-camera.js, package.js) onto the Pi. We added it to the "camera" directory located at /home/pi/camera/.
+3. To run the application, you will need to install the dependent modules, which can be done via NPM package manager. From the terminal’s command line, **type this command:**
 
         npm install
 
-The main packages our application depends on are: raspicam, opencv, twilio-sync, twilio-mcs-client. Allow it a bit of time to build the OpenCV wrapper.
+The main packages our application depends on are: raspicam, opencv, twilio-sync, twilio-mcs-client. Allow it a bit of time to download the packages and build the OpenCV wrapper.
+
 4. The script also needs a place to save the photos it takes. Create one by adding a directory in the same place you copied the security-camera.js script.
 
         mkdir /home/pi/camera/images
