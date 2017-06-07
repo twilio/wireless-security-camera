@@ -11,7 +11,7 @@ const CV = require('opencv');
 const cameraId = 'your-camera-id';
 const cameraSecret = 'your-camera-secret';
 const clientBootstrapUrl = 'https://your-domain.twil.io/cameraauthenticate';
-const imageDirectory = './images/';
+const imageDirectory = '/home/pi/camera/images/';
 
 let accessManager;
 let config;
