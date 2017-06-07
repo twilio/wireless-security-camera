@@ -11,6 +11,7 @@ const CV = require('opencv');
 const cameraId = 'your-camera-id';
 const cameraSecret = 'your-camera-secret';
 const clientBootstrapUrl = 'https://your-domain.twil.io/cameraauthenticate';
+const imageDirectory = './images/';
 
 let accessManager;
 let config;
@@ -27,7 +28,7 @@ let captureSettings = {
   width: 640, height: 360,
   mode: "timelapse",
   awb: 'cloud',
-  output: '/tmp/camera%02d.jpg',
+  output: imageDirectory + 'camera%03d.jpg',
   q: 80, rot: 180, th: '0:0:0',
   nopreview: true,
   timeout: 1800000,  // camera runs for 30 minutes by default
@@ -96,7 +97,7 @@ function uploadImage(file, token) {
 capturer.on("read", function(err, timeStamp, fileName) {
   console.log('Frame captured:', err, timeStamp, fileName);
   if (!fileName.endsWith('~')) {
-    let filePath = '/tmp/' + fileName;
+    let filePath = imageDirectory + fileName;
     CV.readImage(filePath, (err, im) => {
       console.log('CV loaded:', filePath, im)
       if (previousImage && im.width() > 1 && im.height() > 1) {
