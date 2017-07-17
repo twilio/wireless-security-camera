@@ -25,7 +25,7 @@ exports.handler = function(context, event, callback) {
   // containing the grant we just created
   let token = new AccessToken(
     context.ACCOUNT_SID,
-    context.AUTH_TOKEN,
+    context.API_KEY,
     context.API_SECRET, {
       ttl : parseInt(context.TOKEN_TTL) // int and string are different for AccessToken
     }
