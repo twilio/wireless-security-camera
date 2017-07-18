@@ -31,7 +31,7 @@ module.exports = function(callbacks) {
     $.ajax({
       type: "GET",
       url: mcs_url,
-      dataType: 'json',            
+      dataType: 'json',
       beforeSend: function (xhr) { xhr.setRequestHeader('X-Twilio-Token', token); },
       success: function (data, status, xhr) {
         callback(data.links.content_direct_temporary);
@@ -41,8 +41,8 @@ module.exports = function(callbacks) {
 
   function fetchCameraSnapshotTmpUrl(camera) {
     fetchSnapshotTmpUrl(camera.snapshot.mcs_url, function (snapshotTmpUrl) {
-        camera.snapshot.img_url = snapshotTmpUrl;      
-        callbacks.refresh();        
+        camera.snapshot.img_url = snapshotTmpUrl;
+        callbacks.refresh();
     });
   }
 
@@ -76,9 +76,9 @@ module.exports = function(callbacks) {
         map.on("itemUpdated", function (data) {
           console.log("camera control updated", camera.info.id, data.key, JSON.stringify(data.value));
           camera.control[data.key] = data.value;
-          callbacks.refresh(); 
+          callbacks.refresh();
         });
-        callbacks.refresh(); 
+        callbacks.refresh();
       });
     });
   }
@@ -175,7 +175,7 @@ module.exports = function(callbacks) {
       var newDoc = null;
       var invalidCameras;
 
-      if (doc.value.cameras.constructor === Object) {
+      if (doc.value.cameras) {
         invalidCameras = loadCameras();
         if (invalidCameras.length) {
           if (null ===  newDoc) newDoc = $.extend(true, doc.value, {});
@@ -188,11 +188,10 @@ module.exports = function(callbacks) {
         if (null ===  newDoc) newDoc = $.extend(true, doc.value, {});
         newDoc.cameras = {};
       }
-
       return newDoc;
     }).then(function (newDoc) {
       if (newDoc !== null) {
-        return doc.set(newDoc).then(function () {
+        return configDocument.set(newDoc).then(function () {
           console.log("app configuration updated with new value:", newDoc);
         });
       }
@@ -249,7 +248,7 @@ module.exports = function(callbacks) {
       callbacks.refresh();
     }).catch(function (err) {
       callback(err);
-    });   
+    });
   },
 
   regenToken: function (cameraId, callback) {
@@ -278,7 +277,7 @@ module.exports = function(callbacks) {
       return remoteData;
     }).then(function () {
       loadCameras();
-      callbacks.refresh();    
+      callbacks.refresh();
     }).then(function () {
       syncClient.map(CAMERA_CONTROL_MAP_NAME(cameraId)).then(function (map) { map.removeMap(); });
       syncClient.list(CAMERA_ALERTS_LIST_NAME(cameraId)).then(function (list) { list.removeList(); });
@@ -346,7 +345,7 @@ module.exports = function(callbacks) {
     var that = this;
     this.updateToken(function (token) {
       that.fetchConfiguration().then(function () {
-        callbacks.refresh();      
+        callbacks.refresh();
       }).then(function () {
         that.initialized.resolve();
       });
