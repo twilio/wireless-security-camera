@@ -129,10 +129,10 @@ module.exports = function(callbacks) {
   }
 
   function cameraInfoCheck(camera, callback) {
-    if (!camera.id || !camera.id.match(/^[a-zA-Z0-9]+$/))  { callback("camera id is invalid: " + newCamera.id); return false; }
+    if (!camera.id || !camera.id.match(/^[a-zA-Z0-9]+$/))  { callback("camera id is invalid: " + camera.id); return false; }
     if (!camera.name) { callback("camera name is not specified"); return false; }
-    if (!camera.contact_number || !camera.contact_number.match(/^[0-9]+$/)) { callback("camera contact number is invalid(only digits allowed): " + newCamera.contact_number); return false; }
-    if (!camera.twilio_sim_sid || !camera.twilio_sim_sid.match(/^DE[a-z0-9]{32}$/)) { callback("camera sim SID is invalid: " + newCamera.twilio_sim_sid); return false; }
+    if (!camera.contact_number || !camera.contact_number.match(/^[0-9]+$/)) { callback("camera contact number is invalid(only digits allowed): " + camera.contact_number); return false; }
+    if (!camera.twilio_sim_sid || !camera.twilio_sim_sid.match(/^DE[a-z0-9]{32}$/)) { callback("camera sim SID is invalid: " + camera.twilio_sim_sid); return false; }
     return true;
   }
 
