@@ -12,7 +12,10 @@ assets/index.html: angular/build/assets/index.html
 assets/index.min.js: angular/build/assets/index.min.js
 	cp $< $@
 
-build-angular-assets: build-angular assets/index.html assets/index.min.js
+assets/index.min.js.map: angular/build/assets/index.min.js.map
+	cp $< $@
+
+build-angular-assets: build-angular assets/index.html assets/index.min.js assets/index.min.js.map
 
 .PHONY: prepare-angular build-angular build-angular-assets
 
@@ -31,7 +34,7 @@ build-runtime: assets/UserAuthenticator-deployment-instructions.txt assets/Camer
 
 prepare: prepare-angular
 
-build: build-angular-assets build-runtime
+build: build-angular-assets # build-runtime
 
 dev:
 	(cd angular; ./angular/node_modules/.bin/grunt dev)
