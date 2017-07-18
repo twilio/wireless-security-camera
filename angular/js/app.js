@@ -12,7 +12,7 @@ module.exports = function(callbacks) {
   const SyncClient = require("twilio-sync").SyncClient;
   var syncClient;
   var token;
-  var auth = "username=trump&pincode=928462";
+  var auth = "username=twilio&pincode=928462";
   var configDocument;
 
   var cameras = {};

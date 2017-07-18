@@ -1,6 +1,6 @@
 #!/bin/bash
 
-AUTHENTICATOR_URL="https://utter-discussion-7677.twil.io/authenticate?username=trump&pincode=44444"
+AUTHENTICATOR_URL="https://your-runtime-domain.twil.io/authenticate?username=twilio&pincode=44444"
 wget $1 -qO tmp.jpg
 read token upload_url <<EOF
 $(
