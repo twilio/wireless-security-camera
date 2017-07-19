@@ -41,11 +41,11 @@ To do this, we need to add a line to the file **rc.local** on the Pi, which runs
 
 * From the command line, **type this to edit rc.local:**
 
-        sudo nano /etc/rc.local
+        $ sudo nano /etc/rc.local
 
 Add this line right before it reads ‘exit 0’:
 
-        node /home/pi/camera/security-camera.js
+        $ node /home/pi/camera/security-camera.js
 
 rc.local will look like the following:
 
