@@ -45,7 +45,7 @@ To do this, we need to add a line to the file **rc.local** on the Pi, which runs
 
 Add this line right before it reads ‘exit 0’:
 
-        $ node /home/pi/camera/security-camera.js
+        node /home/pi/camera/security-camera.js
 
 rc.local will look like the following:
 

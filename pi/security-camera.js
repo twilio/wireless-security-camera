@@ -39,12 +39,19 @@ let capturer = new RaspiCam(captureSettings);
 let previousImage;
 
 function bootstrapClient(id, secret) {
-  return new Promise(resolve => {
-    request(clientBootstrapUrl + '?camera_id=' + id + '&camera_token=' + secret, (err, res) => {
+  return new Promise(resolve => pollConfiguration(id, secret, resolve));
+}
+
+function pollConfiguration(id, secret, resolve) {
+  request(clientBootstrapUrl + '?camera_id=' + id + '&camera_token=' + secret, (err, res) => {
+    if (!err) {
       let response = JSON.parse(res.body);
       console.log('Got configuration for camera:', response.camera_id);
       resolve(response);
-    });
+    } else {
+      console.log('Failed fetching camera configuration:', err);
+      setTimeout(() => pollConfiguration(id, secret, resolve), 2000);
+    }
   });
 }
 
