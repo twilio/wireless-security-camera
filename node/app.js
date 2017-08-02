@@ -102,9 +102,9 @@ app.get('/', function(req, res) {
               }
             }
           });
-        }
+        };
+        db_calls.push(call);
       }
-      db_calls.push(call);
     }
     async.parallel(db_calls,
       function(err, results) {
@@ -182,35 +182,8 @@ app.post('/add-camera', function(req, res) {
   });
 });
 
-app.post('/add-camera', function(req, res) {
-  var name = req.body.name.replace(/'/g, "\\'");
-  var contact_number = req.body.contact_number;
-  var twilio_sid = req.body.twilio_sid;
-  var token = hat();
-  // check twilio for SIM SID correctness
-  twilio.preview.wireless.sims(twilio_sid).fetch(function(err, device) {
-    if(err) {
-      winston.error(err);
-      res.redirect('/cameras');
-    } else {
-      db.run("INSERT INTO cameras (name, contact_number, twilio_sid, token, created_at) VALUES (?, ?, ?, ?, ?)", [name, contact_number, twilio_sid, token, moment().utc().format()],  function (error) {
-        if (error) {
-          winston.error(error);
-          res.render('camera_list', { devices: [], error: "database error", page: "list" });
-        } else {
-          // change twilio alias to SIM name
-          twilio.preview.wireless.sims(twilio_sid).update({
-            "alias": name
-          }, function(err, device) {});
-          res.redirect('/cameras');
-        }
-      });
-    }
-  });
-});
-
 app.post('/camera/:id/edit', function(req, res) {
-  var id = req.params.id
+  var id = req.params.id;
   var name = req.body.name.replace(/'/g, "\\'");
   var contact_number = req.body.contact_number;
   var twilio_sid = req.body.twilio_sid;
