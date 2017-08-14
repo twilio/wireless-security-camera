@@ -2,6 +2,8 @@
 ### 3d-printed case
 This Security Camera Blueprint comes with CAD files designed for this 3D printout. You can find the CAD files here. Visit [Voodoo Manufacturing](https://voodoomfg.com/) to take advantage of their developer-first API driven 3d-printers to print out the models. Use [Sculpteo](http://sculpteo.com/) to print out the acrylic to cover the sides of the Security Camera.
 
+**Note:** these files are optional and not necessary to construct this Blueprint.
+
 ### 3d-print out descriptions
 
 | Filename                             | Description                                                            |
