@@ -1,5 +1,5 @@
 # Security Camera Blueprint
-### Twilio Function scripts
+### Twilio Functions scripts
 The scripts located in this directory are meant to run on [Twilio Functions](https://www.twilio.com/functions).
 
 ### What is Functions?
