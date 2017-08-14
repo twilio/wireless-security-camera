@@ -10,7 +10,7 @@ Twilio Runtime is a suite designed to help you build, scale and operate your app
 ### Deploy Runtime assets
 Runtime assets are used to host the front-end of this Blueprint. The front-end is written using the [AngularJS](https://angularjs.org/) framework and compiled as a [single page application](https://en.wikipedia.org/wiki/Single-page_application). To deploy, you need to download the latest version of **index.html** and **index.min.js** from the **assets** folder.
 
-You may modify these files as you wish and bundle up by running the following commands in a terminal:
+You may modify these files as you wish and bundle up by running the following commands in a terminal from the root directory:
 
 ```
 make prepare
