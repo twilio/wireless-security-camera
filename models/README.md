@@ -4,7 +4,7 @@ This Security Camera Blueprint comes with CAD files designed for this 3D printou
 
 **Note:** these files are optional and not necessary to construct this Blueprint.
 
-### 3d-print out descriptions
+### File descriptions
 
 | Filename                             | Description                                                            |
 |--------------------------------------|------------------------------------------------------------------------|
