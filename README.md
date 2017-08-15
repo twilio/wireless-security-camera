@@ -5,10 +5,10 @@
 
 Full instructions for this tutorial can be found in the [Security Camera Blueprint](https://www.twilio.com/wireless/blueprints/security-camera/). This repository includes all files neccessary to build the [Security Camera Blueprint](https://www.twilio.com/wireless/blueprints/security-camera/).
 
-**Problem** All businesses require safety for their property, assets, and employees, but most cannot afford or rely on a hired security team. If they had a low-cost, reliable, and technical security solution, there would be a peace of mind about the protection of their resources.
+**Problem** All businesses desire safety for property, assets, and employees, but most cannot afford or rely on a hired security team. A low-cost, reliable, simple remote security solution would provide peace of mind around the protection of enterprise resources.
 
 
-**Solution** Remove the hassle from remote monitoring with the best practices discussed in this Blueprint designed to accelerate your business development. We will create a Twilio-powered device that keeps watch over remote locations and alerts stakeholders of intrusions or safety concerns. Constantly monitoring, the device notifies stakeholders of intrusions that threaten assets or safety.
+**Solution** Remove the hassle from remote monitoring with the best practices discussed in this Blueprint, designed to accelerate the development of new security solutions and products. We will create a Twilio-powered device that keeps watch over remote locations and alerts administrators of intrusions or safety concerns. Constantly monitoring, the device notifies stakeholders of events that threaten assets or safety.
 
 
 **Degree of Difficulty (1-5): 3**  This device requires some knowledge of Raspberry Pi, software installation, and some Linux features including the command line.
