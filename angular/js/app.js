@@ -9,7 +9,7 @@ function CAMERA_ARCHIVES_LIST_NAME(cameraId, alertId) { return "cameras." + came
 module.exports = function(callbacks) {
   const $ = require("jquery");
   const crypto = require("crypto");
-  const SyncClient = require("twilio-sync").SyncClient;
+  const SyncClient = require("twilio-sync").Client;
   var syncClient;
   var token;
   var auth = "username=twilio&pincode=928462";
