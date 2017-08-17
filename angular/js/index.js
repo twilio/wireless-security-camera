@@ -3,7 +3,7 @@
 const $ = require("jquery");
 const angular = require("angular");
 const moment = require("moment");
-const ngRoute = require("angular-route");
+require("angular-route");
 
 const MOMENT_FORMAT = "MMM DD YYYY @ hh:mm";
 
@@ -30,7 +30,7 @@ window.app = new App({
 
 angular
   .module("app", [
-    ngRoute
+    'ngRoute'
   ])
   .controller('DashboardViewCtrl', ['$scope', function ($scope) {
     $currentViewScope = $scope;

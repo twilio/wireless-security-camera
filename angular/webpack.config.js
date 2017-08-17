@@ -3,9 +3,25 @@ var webpack = require("webpack");
 
 module.exports = {
   cache: true,
+  // Group dependencies into different entries and use CommonsChunkPlugin to share
+  // the common parts and generate smaller chunks
   entry: {
     "index": "./js/index.js",
-    "index.min": "./js/index.js"
+    "styles": [
+        "./scss/main.scss",
+    ],
+    "vendor": [
+        "bootstrap", "bootstrap-webpack",
+        "moment",
+        "crypto",
+    ]
+  },
+  // use externals to exclude components that are statically included from CDNs
+  externals: {
+    "jquery": 'jQuery',
+    "twilio-sync": "Twilio.Sync",
+    "angular": "angular",
+    "angular-route": { amd: "angular-route" }, 
   },
   output: {
     path: path.join(__dirname, "build", "assets"),
@@ -34,11 +50,11 @@ module.exports = {
       },
 
       // required for bootstrap icons
-      { test: /\.woff$/,   loader: "url-loader?prefix=font/&limit=5000&mimetype=application/font-woff" },
-      { test: /\.woff2$/,  loader: "url-loader?prefix=font/&limit=5000&mimetype=application/font-woff2" },
-      { test: /\.ttf$/,    loader: "file-loader?prefix=font/" },
-      { test: /\.eot$/,    loader: "file-loader?prefix=font/" },
-      { test: /\.svg$/,    loader: "file-loader?prefix=font/" },
+      { test: /\.woff$/,   loader: "url-loader?limit=5000&mimetype=application/font-woff" },
+      { test: /\.woff2$/,  loader: "url-loader?limit=5000&mimetype=application/font-woff2" },
+      { test: /\.ttf$/,    loader: "file-loader" },
+      { test: /\.eot$/,    loader: "file-loader" },
+      { test: /\.svg$/,    loader: "file-loader" },
 
       // generate index.html
       { test: /\/index\.html$/, loader : "file-loader?name=index.html" },
@@ -48,5 +64,9 @@ module.exports = {
   },
   devtool: 'source-map',
   plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+        names: ['styles', 'vendor'],
+        minChunks: Infinity
+    }),
   ]
 };
