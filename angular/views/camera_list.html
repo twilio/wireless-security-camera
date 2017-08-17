@@ -1,24 +1,24 @@
 <div class="row">
   <div class="col-lg-12">
     <div class="page-header">
-      <h1 id="tables">Cameras</h1>
+      <h1 id="tables">Configuration</h1>
     </div>
 
     <div class="bs-component">
-      <table class="table table-striped table-hover ">
+      <table class="table table-striped table-hover">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Contact Number</th>
-            <th>Twilio SID</th>
-            <th>Token</th>
-            <th>Created</th>
-            <th>Actions</th>
+            <th><strong>Id</strong></th>
+            <th><strong>Name</strong></th>
+            <th><strong>Phone Number</strong></th>
+            <th><strong>SIM Sid</strong></th>
+            <th><strong>Token</strong></th>
+            <th><strong>Created</strong></th>
+            <th><strong>Actions</strong></th>
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="camera in cameras" ng-class="{'text-success': editedCameraInfo.id === camera.info.id}">
+          <tr ng-repeat="camera in cameras" class="chalk-background" ng-class="{'text-success': editedCameraInfo.id === camera.info.id}">
             <td>{{ camera.info.id }}</td>
             <td>{{ camera.info.name }}</td>
             <td>{{ camera.info.contact_number }}</td>
@@ -38,46 +38,50 @@
       </table>
     <div id="source-button" class="btn btn-primary btn-xs" style="display: none;">&lt; &gt;</div></div><!-- /example -->
   </div>
-  <div class="divider col-lg-10 bg-primary"></div>
 </div>
 
-<a class="btn btn-primary add-camera-show">Add New Camera</a>
-<div class="row add-camera">
-  <div class="col-lg-6">
+<button class="btn btn-primary add-camera-show">New Security Camera</button>
+
+<div class="row add-camera chalk-background">
+  <div class="col-lg-12">
     <form class="form-horizontal" ng-submit="addCamera()">
       <fieldset>
-        <legend>New camera</legend>
+        <h2>Add Security Camera</h2>
 
         <div class="form-group">
-          <label for="id" class="col-lg-2 control-label">Id</label>
-          <div class="col-lg-10">
-            <input type="text" class="form-control" ng-model="newCamera.id" id="id" placeholder="ID">
+          <label for="id" class="col-lg-2">Id</label>
+          <div class="col-lg-12">
+            <input type="text" class="form-control" ng-model="newCamera.id" id="id" placeholder="">
+            <p>This can be any unique alphanumeric identifier.</p>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="name" class="col-lg-2 control-label">Name</label>
-          <div class="col-lg-10">
-            <input type="text" class="form-control" ng-model="newCamera.name" id="name" placeholder="Name">
+          <label for="name" class="col-lg-2">Name</label>
+          <div class="col-lg-12">
+            <input type="text" class="form-control" ng-model="newCamera.name" id="name" placeholder="">
+            <p>Give your Security Camera a descriptive name for the dashboard.</p>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="contact_number" class="col-lg-2 control-label">Contact Number</label>
-          <div class="col-lg-10">
-            <input type="text" class="form-control" ng-model="newCamera.contact_number" id="contact_number" placeholder="4123620201">
+          <label for="contact_number" class="col-lg-2">Phone Number</label>
+          <div class="col-lg-12">
+            <input type="text" class="form-control" ng-model="newCamera.contact_number" id="contact_number" placeholder="">
+            <p>The phone number that receives text notifications.</p>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="twilio_sim_sid" class="col-lg-2 control-label">Twilio SIM SID</label>
-          <div class="col-lg-10">
-            <input type="text" class="form-control" ng-model="newCamera.twilio_sim_sid" id="twilio_sim_sid" placeholder="Twilio SIM SID">
+          <label for="twilio_sim_sid" class="col-lg-2">Twilio SIM Sid</label>
+          <div class="col-lg-12">
+            <input type="text" class="form-control" ng-model="newCamera.twilio_sim_sid" id="twilio_sim_sid" placeholder="">
+            <p>You can find your SIM Sid in Twilio's <a href="https://www.twilio.com/console/wireless/sims/">Console</a>.</p>
           </div>
         </div>
 
         <div class="form-group">
-          <div class="col-lg-10 col-lg-offset-2">
+          <div class="col-lg-12">
             <button type="submit" class="btn btn-primary">Submit</button>
             <button type="reset" class="btn btn-default add-camera-cancel">Cancel</button>
           </div>
@@ -90,41 +94,45 @@
 </div>
 
 <div class="row edit-camera">
-  <div class="col-lg-6">
+  <div class="col-lg-12">
     <form class="form-horizontal" ng-submit="updateCamera()">
       <fieldset>
-        <legend>Edit camera</legend>
+        <legend>Update Security Camera</legend>
 
         <div class="form-group">
-          <label for="id" class="col-lg-2 control-label">Id</label>
-          <div class="col-lg-10">
-            <input type="text" class="form-control" ng-model="editedCameraInfo.id" id="id" value="{{ editedCameraInfo.id }}" placeholder="ID" disabled>
+          <label for="id" class="col-lg-2">Id</label>
+          <div class="col-lg-12">
+            <input type="text" class="form-control" ng-model="editedCameraInfo.id" id="id" value="{{ editedCameraInfo.id }}" placeholder="" disabled>
+            <p>This can be any unique alphanumeric identifier.</p>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="name" class="col-lg-2 control-label">Name</label>
-          <div class="col-lg-10">
-            <input type="text" class="form-control" ng-model="editedCameraInfo.name" id="name" value="{{ editedCameraInfo.name }}" placeholder="Name">
+          <label for="name" class="col-lg-2">Name</label>
+          <div class="col-lg-12">
+            <input type="text" class="form-control" ng-model="editedCameraInfo.name" id="name" value="{{ editedCameraInfo.name }}" placeholder="">
+            <p>Give your Security Camera a descriptive name for the dashboard.</p>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="contact_number" class="col-lg-2 control-label">Contact Number</label>
-          <div class="col-lg-10">
-            <input type="text" class="form-control" ng-model="editedCameraInfo.contact_number" id="contact_number" value="{{ editedCameraInfo.contact_number }}" placeholder="4123620201">
+          <label for="contact_number" class="col-lg-2">Phone Number</label>
+          <div class="col-lg-12">
+            <input type="text" class="form-control" ng-model="editedCameraInfo.contact_number" id="contact_number" value="{{ editedCameraInfo.contact_number }}" placeholder="">
+            <p>This is the phone number that receives text notifications.</p>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="twilio_sim_sid" class="col-lg-2 control-label">Twilio SIM SID</label>
-          <div class="col-lg-10">
-            <input type="text" class="form-control" ng-model="editedCameraInfo.twilio_sim_sid" id="twilio_sim_sid" value="{{ editedCameraInfo.twilio_sim_sid }}" placeholder="Twilio SIM SID">
+          <label for="twilio_sim_sid" class="col-lg-2">Twilio SIM Sid</label>
+          <div class="col-lg-12">
+            <input type="text" class="form-control" ng-model="editedCameraInfo.twilio_sim_sid" id="twilio_sim_sid" value="{{ editedCameraInfo.twilio_sim_sid }}" placeholder="">
+            <p>You can find your SIM Sid in Twilio's <a href="https://www.twilio.com/console/wireless/sims/">Console</a>.</p>
           </div>
         </div>
 
         <div class="form-group">
-          <div class="col-lg-10 col-lg-offset-2">
+          <div class="col-lg-10">
             <button type="submit" class="btn btn-primary">Submit</button>
             <button type="reset" class="btn btn-default edit-camera-cancel">Cancel</button>
           </div>

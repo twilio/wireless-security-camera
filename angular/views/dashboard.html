@@ -1,17 +1,27 @@
-<h1>Active Cameras</h1>
+<h1>Active Security Cameras</h1>
 
-<h3 ng-show="noCamera()" class="ng-show">We aren't tracking any cameras right now.</h3>
+<p ng-show="noCamera()">We aren't tracking any Security Cameras right now. Click the Add Security Camera button to get started.</p>
 
-<div ng-repeat="camera in cameras" class="jumbotron camera camera{{ camera.info.id }}">
+<div ng-repeat="camera in cameras" class="jumbotron camera camera{{ camera.info.id }} chalk-background">
   <h3>
-    {{ camera.info.name }}
-    <a href="#!/cameras/{{ camera.info.id }}">(Browse archived alarms)</a>
-    <small><input type="checkbox" ng-model="camera.control.preview.enabled" ng-change="switchPreview(camera.info.id)">Preview</small>
-    <small><input type="checkbox" ng-model="camera.control.arm.enabled" ng-change="switchArm(camera.info.id)">Armed</small>
+    <span>{{ camera.info.name }}</span>
+    <div>
+      <span class="small">Select the mode for your camera</span>
+        <select class="selectpicker small"
+          ng-model="selectedCamera"
+          ng-change="update(selectedCamera, camera)">
+            <option value="">Click to select</option>
+            <option value="live-feed" ng-selected="camera.control.preview.enabled">Live Feed</option>
+            <option value="arm" ng-selected="camera.control.arm.enabled">Armed</option>
+        </select>
+    </div>
   </h3>
+
   <div class="row">
     <div class="col-lg-8 col-lg-offset-2 img-parent">
-      <img class="camera-feed" ng-src="{{ camera.snapshot.img_url }}" />
+      <div class="camera-feed">
+        <img ng-src="{{ camera.snapshot.img_url }}" />
+      </div>
     </div>
   </div>
   <div class="row motion_stats">
@@ -22,6 +32,9 @@
       <button class="alert alert-danger" ng-if="camera.control.alarm.id !== camera.control.arm.responded_alarm" ng-click="disarm(camera.info.id)">
         <strong>Dismiss Alarm</strong>
       </button>
+      <div>
+        <a href="#!/cameras/{{ camera.info.id }}">Browse archived alerts</a>
+      </div>
     </div>
   </div>
 </div>
