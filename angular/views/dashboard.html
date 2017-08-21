@@ -1,0 +1,41 @@
+<h1>Active Security Cameras</h1>
+
+<p ng-show="noCamera()">We aren't tracking any Security Cameras right now. Click the Add Security Camera button to get started.</p>
+
+<div ng-repeat="camera in cameras" class="jumbotron camera camera{{ camera.info.id }} chalk-background">
+  <h3>
+    <span>{{ camera.info.name }}</span>
+    <div>
+      <span class="small">Select the mode for your camera</span>
+        <select class="selectpicker small"
+          ng-model="selectedCamera"
+          ng-init="selectedCamera = camera.control.preview.enabled ? 'live-feed' : 'arm'"
+          ng-change="update(selectedCamera, camera)">
+            <option value="">Click to select</option>
+            <option value="live-feed" ng-selected="camera.control.preview.enabled">Live Feed</option>
+            <option value="arm" ng-selected="camera.control.arm.enabled">Armed</option>
+        </select>
+    </div>
+  </h3>
+
+  <div class="row">
+    <div class="col-lg-8 col-lg-offset-2 img-parent">
+      <div class="camera-feed">
+        <img ng-src="{{ camera.snapshot.img_url }}" />
+      </div>
+    </div>
+  </div>
+  <div class="row motion_stats">
+    <div class="col-lg-4 col-lg-offset-4">
+      <div class="alert alert-success" ng-if="camera.control.alarm.id === camera.control.arm.responded_alarm">
+        <strong>No Active Alarm</strong>
+      </div>
+      <button class="alert alert-danger" ng-if="camera.control.alarm.id !== camera.control.arm.responded_alarm" ng-click="disarm(camera.info.id)">
+        <strong>Dismiss Alarm</strong>
+      </button>
+      <div>
+        <a href="#!/cameras/{{ camera.info.id }}">Browse archived alerts</a>
+      </div>
+    </div>
+  </div>
+</div>

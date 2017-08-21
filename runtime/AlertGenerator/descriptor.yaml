@@ -1,0 +1,6 @@
+name: AlertGenerator
+type: function
+path: /alertgenerator
+description: |
+  Generate alerts according to incoming snapshots.
+script: AlertGenerator.js

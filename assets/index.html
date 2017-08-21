@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html ng-app="app">
+  <head>
+    <title>Twilio Security Camera</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="#!/" class="navbar-brand">Twilio Security Camera</a>
+          <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar-main">
+          <ul class="nav navbar-nav">
+            <li><a href="#!/cameras/">Cameras</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="container container-content" ng-view></div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-route.js"></script>
+    <script src="https://media.twiliocdn.com/sdk/js/sync/v0.5/twilio-sync.js"></script>  
+    <script src="/assets/vendor.js"></script>
+    <script src="/assets/styles.js"></script>
+    <script src="/assets/index.js"></script>
+    <script type="text/javascript">
+      app.init();
+    </script>
+  </body>
+</html>
