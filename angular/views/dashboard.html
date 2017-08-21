@@ -9,6 +9,7 @@
       <span class="small">Select the mode for your camera</span>
         <select class="selectpicker small"
           ng-model="selectedCamera"
+          ng-init="selectedCamera = camera.control.preview.enabled ? 'live-feed' : 'arm'"
           ng-change="update(selectedCamera, camera)">
             <option value="">Click to select</option>
             <option value="live-feed" ng-selected="camera.control.preview.enabled">Live Feed</option>
