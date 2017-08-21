@@ -1,0 +1,28 @@
+<div class="archive-notification" ng-show="!snapshotTmpUrl">
+  <h1>No Security Camera Alerts</h1>
+  <p>No notifications have been logged.</p>
+</div>
+
+<div ng-show="!!snapshotTmpUrl">
+  <h1>{{ camera.info.name }}</h1>
+
+  <div class="alerts-list">
+    <span>Select an alert to view
+      <select class="form-control" id="alertSelect" ng-model="selectedAlertId" ng-change="selectedAlertChanged()">
+        <option value="" selected>Click to select</option>
+        <option ng-repeat="alert in alerts" value="{{alert.data.index}}">{{alert.data.index}} : {{alert.data.value.datetime_utc | moment}}</option>
+      </select>
+    </span>
+  </div>
+
+  <div class="archive-view row chalk-background">
+    <div class="camera-feed buffer">
+      <img ng-src="{{ snapshotTmpUrl }}" />
+    </div>
+  </div>
+
+  <div class="row navigate-archive">
+      <a href="" ng-click="selectPreviousArchive()">&lt;Previous</a> |
+      <a href="" ng-click="selectNextArchive()">Next &gt;</a>
+  </div>
+</div>

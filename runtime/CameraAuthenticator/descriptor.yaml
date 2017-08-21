@@ -1,0 +1,6 @@
+name: CameraAuthenticator
+type: function
+path: /cameraauthenticate
+description: |
+  Generate short-term jwt token and links for cameras to access twilio services
+script: CameraAuthenticator.js

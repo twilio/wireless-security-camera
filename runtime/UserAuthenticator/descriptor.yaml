@@ -1,0 +1,6 @@
+name: UserAuthenticator
+type: function
+path: /userauthenticate
+description: |
+  Generate short-term jwt token for UI and its authorized operator to access twilio services
+script: UserAuthenticator.js

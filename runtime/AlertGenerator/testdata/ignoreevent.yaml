@@ -1,0 +1,11 @@
+AccountSid: AC853deee1d40f428141c6b28812aa253f
+EndpointId: twi1-9cebc901e9ac4631a29172afedd6443d
+Identity: security-cam-sync-qchht23ys1i57y14i
+DocumentSid: ET5d600ce03d1f44399868c2b9c28065cd
+DocumentRevision: 42
+DocumentData: "{\"mcs_url\":\"https://mcs.us1.twilio.com/v1/Services/IS8d7c53a5fd4d537f4e50e80c7cb1a688/Media/MEe875e4eb04e3405ce5d1ededfd7b7380\"}"
+EventType: not_interesting_event
+DocumentUniqueName: cameras.TEST.snapshot
+DateCreated: 2017-05-31T06:54:06.038-07:00
+ServiceSid: IS8d7c53a5fd4d537f4e50e80c7cb1a688
+ProtocolVersion: v3
