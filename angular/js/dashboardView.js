@@ -7,15 +7,16 @@ var dashboardView = {
     $scope.noCamera = function () { return Object.keys(app.cameras).length === 0; }
     $scope.update = function(value, camera) {
       if (value == "live-feed") {
-        app.controlPreview(camera.info.id);
         camera.control.preview.enabled = true;
         camera.control.arm.enabled = false;
       }
       else {
-        app.controlArm(camera.info.id);
         camera.control.preview.enabled = false;
-        camera.control.arm.enabled = true;
+        camera.control.arm.enabled = true;        
       }
+      app.controlPreview(camera.info.id);
+      app.controlArm(camera.info.id);
+      console.log(camera.info)
     };
     $scope.switchPreview = function (cameraId) {
       app.controlPreview(cameraId);
