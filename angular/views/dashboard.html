@@ -8,9 +8,9 @@
     <div>
       <span class="small">Select the mode for your camera</span>
         <select class="selectpicker small"
-          ng-model="selectedCamera"
-          ng-init="selectedCamera = camera.control.preview.enabled ? 'live-feed' : 'arm'"
-          ng-change="update(selectedCamera, camera)">
+          ng-model="selectedCameraMode"
+          ng-init="selectedCameraMode = camera.control.preview.enabled ? 'live-feed' : 'arm'"
+          ng-change="update(selectedCameraMode, camera)">
             <option value="">Click to select</option>
             <option value="live-feed" ng-selected="camera.control.preview.enabled">Live Feed</option>
             <option value="arm" ng-selected="camera.control.arm.enabled">Armed</option>
@@ -21,7 +21,7 @@
   <div class="row">
     <div class="col-lg-8 col-lg-offset-2 img-parent">
       <div class="camera-feed">
-        <img ng-src="{{ camera.snapshot.img_url }}" />
+        <img ng-src="{{ camera.snapshot.img_url }}" imageloaded="onload(camera)"/>
       </div>
     </div>
   </div>

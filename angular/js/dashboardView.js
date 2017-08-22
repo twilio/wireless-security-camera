@@ -18,6 +18,10 @@ var dashboardView = {
       app.controlArm(camera.info.id);
       console.log(camera.info)
     };
+    $scope.onload = function (camera) {
+        console.info("Image loaded: " + camera.snapshot.img_url);
+        camera.snapshotLoadingInProgress = false;
+    };
     $scope.switchPreview = function (cameraId) {
       app.controlPreview(cameraId);
     };

@@ -41,7 +41,13 @@ module.exports = function(callbacks) {
 
   function fetchCameraSnapshotTmpUrl(camera) {
     fetchSnapshotTmpUrl(camera.snapshot.mcs_url, function (snapshotTmpUrl) {
-        camera.snapshot.img_url = snapshotTmpUrl;
+        // do not load new image when last image loading is in progress
+        // otherwise user might experience stalling camera view
+        if (!camera.snapshotLoadingInProgress) {
+            camera.snapshotLoadingInProgress = true;
+            camera.snapshot.img_url = snapshotTmpUrl;
+            console.info("Loading image: " + camera.snapshot.img_url);
+        }
         callbacks.refresh();
     });
   }
