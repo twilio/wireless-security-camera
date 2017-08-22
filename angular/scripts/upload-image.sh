@@ -9,15 +9,8 @@
 # 3. To trigger a alarm, touch the file at /tmp/wireless-security-camera-alarm.trigger
 #
 # Example loopy loopy command:
-# $ while img=`ls ~/Pictures/cats/cat_photos/*.{png,jpg} | sort -R | head -n1`;do ./upload-image.sh $img;done
+# $ while true;do for img in `ls ~/Pictures/cats/cat_photos/*.{png,jpg} | sort -R | head -n10`;do ./upload-image.sh $img;done;done
 #
-
-IMAGE_SIZE=640x480
-ALARM_TRIGGER_FILE=/tmp/wireless-security-camera-alarm.trigger
-TMP_IMG_FILE=/tmp/wireless-security-camera-scaled.jpg
-echo "Scaling image $1 to $IMAGE_SIZE..."
-convert "$1" -resize $IMAGE_SIZE -background black -gravity center -extent $IMAGE_SIZE "$TMP_IMG_FILE"
-echo "Scaling done."
 
 echo "Authenticate camera..."
 read camera_token camera_sync_instance camera_upload_url camera_snapshot_document <<eof
@@ -43,6 +36,15 @@ $(
 )
 eof
 test $? -eq 0 && echo "Camera authenticated." || exit -1
+
+while (( "$#" ));do
+
+IMAGE_SIZE=640x480
+ALARM_TRIGGER_FILE=/tmp/wireless-security-camera-alarm.trigger
+TMP_IMG_FILE=/tmp/wireless-security-camera-scaled.jpg
+echo "Scaling image $1 to $IMAGE_SIZE..."
+convert "$1" -resize $IMAGE_SIZE -background black -gravity center -extent $IMAGE_SIZE "$TMP_IMG_FILE"
+echo "Scaling done."
 
 echo "Uploading image to MCS..."
 read mcs_content_url <<eof
@@ -93,3 +95,6 @@ syncClient.document("$camera_snapshot_document").then(doc => {
 });
 eof
 test $? -eq 0 && echo "Camera '$RUNTIME_CAMERA_ID' snapshot updated." || exit -1
+
+shift
+done
