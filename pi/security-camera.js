@@ -82,16 +82,16 @@ function updateCameraState(item) {
   }
 }
 
-function uploadImage(file, token) {
+function uploadImage(file, token, isSticky) {
   return new Promise(resolve => {
     request({
       url: config.links.upload_url,
       method: 'POST',
       body: fs.createReadStream(file),
-      qs: {
+      qs: isSticky ? {
         MessageSid: 'ME' + uuid().replace(/-/g, ''),
         ChannelSid: cameraSnapshot.sid
-      },
+      } : null,
       headers: {
         'X-Twilio-Token': token,
         'Content-Type': 'image/jpeg'
@@ -121,7 +121,7 @@ capturer.on("read", function(err, timeStamp, fileName) {
           if (statePreviewing || changesDetected || pendingAlarm != respondedAlarm) {
             // upload the image either if the preview is enabled
             // or the image has artifacts and an unresponded alarm is pending
-            uploadImage(filePath, config.token).then(res => {
+            uploadImage(filePath, config.token, changesDetected).then(res => {
               console.log('Uploaded:', res.media.sid, res.location);
               cameraSnapshot.set({
                 date_captured: new Date(timeStamp).toUTCString(),
