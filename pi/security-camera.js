@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const request = require('request');
+const uuid = require('uuid/v4');
 
 const TwilioCommon = require('twilio-common');
 const SyncClient = require('twilio-sync');
@@ -87,6 +88,10 @@ function uploadImage(file, token) {
       url: config.links.upload_url,
       method: 'POST',
       body: fs.createReadStream(file),
+      qs: {
+        MessageSid: 'ME' + uuid().replace(/-/g, ''),
+        ChannelSid: cameraSnapshot.sid
+      },
       headers: {
         'X-Twilio-Token': token,
         'Content-Type': 'image/jpeg'
