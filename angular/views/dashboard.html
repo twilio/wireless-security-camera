@@ -7,13 +7,11 @@
     <span>{{ camera.info.name }}</span>
     <div>
       <span class="small">Select the mode for your camera</span>
-        <select class="selectpicker small"
-          ng-model="selectedCameraMode"
-          ng-init="selectedCameraMode = camera.control.preview.enabled ? 'live-feed' : 'arm'"
-          ng-change="update(selectedCameraMode, camera)">
-            <option value="">Click to select</option>
-            <option value="live-feed" ng-selected="camera.control.preview.enabled">Live Feed</option>
-            <option value="arm" ng-selected="camera.control.arm.enabled">Armed</option>
+        <select class="selectpicker small" autocomplete="off"
+          ng-model="camera.mode"
+          ng-change="changeCameraMode(camera)">
+            <option value="live-feed">Live Feed</option>
+            <option value="arm">Armed</option>
         </select>
     </div>
   </h3>

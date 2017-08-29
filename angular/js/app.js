@@ -78,15 +78,27 @@ module.exports = function(callbacks) {
           alarm : items[1].value,
           arm : items[2].value,
         };
+        updateCameraMode(camera);
         console.log("camera control fetched", camera.info.id, JSON.stringify(camera.control));
         map.on("itemUpdated", function (data) {
           console.log("camera control updated", camera.info.id, data.key, JSON.stringify(data.value));
           camera.control[data.key] = data.value;
+          updateCameraMode(camera);
           callbacks.refresh();
         });
         callbacks.refresh();
       });
     });
+  }
+
+  function updateCameraMode(camera) {
+    if(camera.control.preview.enabled === true &&
+      camera.control.arm.enabled === false) {
+      camera.mode = "live-feed";
+    } else {
+      camera.mode = "arm";
+    }
+    console.log("updateCameraMode", camera.info.id, camera.mode);
   }
 
   function loadCameras() {
@@ -302,11 +314,35 @@ module.exports = function(callbacks) {
 
   controlArm: function (cameraId) {
     var camera = cameras[cameraId];
-    camera.controlMap.set("arm", camera.control.arm)
+    camera.controlMap
+    .set("arm", camera.control.arm)
     .then(function () {
       console.log("switchArm updated", cameraId, camera.control.arm);
     }).catch(function (err) {
       console.err("switchArm failed", err);
+    });
+  },
+
+  syncCameraMode: function (cameraId) {
+    var camera = cameras[cameraId];
+
+    if (camera.mode == "live-feed") {
+      camera.control.preview.enabled = true;
+      camera.control.arm.enabled = false;
+    } else /* armed mode */ {
+      camera.control.preview.enabled = false;
+      camera.control.arm.enabled = true;        
+      camera.mode = "arm";
+    }
+    camera.controlMap
+    .set("preview", camera.control.preview)
+    .then(function () {
+        return camera.controlMap.set("arm", camera.control.arm)
+    })
+    .then(function () {
+      console.log("syncCameraMode control updated", cameraId, camera.control);
+    }).catch(function (err) {
+      console.err("syncCameraMode failed", cameraId, err);
     });
   },
 
