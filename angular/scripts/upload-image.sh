@@ -46,6 +46,16 @@ echo "Scaling image $1 to $IMAGE_SIZE..."
 convert "$1" -resize $IMAGE_SIZE -background black -gravity center -extent $IMAGE_SIZE "$TMP_IMG_FILE"
 echo "Scaling done."
 
+alarm_triggered=false
+image_uploading_param=
+if [ -f $ALARM_TRIGGER_FILE ];then
+    echo "!!! Alarm triggered !!!"
+    alarm_triggered=true
+    image_uploading_param="?ChannelSid=${camera_sync_instance}&MessageSid=MM`uuidgen | tr 'A-Z' 'a-z' | sed 's/-//g'`"
+    echo "Uploading parameter: ""${image_uploading_param}"
+    rm -f $ALARM_TRIGGER_FILE
+fi
+
 echo "Uploading image to MCS..."
 read mcs_content_url <<eof
 $(
@@ -65,18 +75,12 @@ $(
 #     "size": 78056,
 #     "url": "https://mcs.us1.twilio.com/v1/Services/ISxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/Media/MExxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 # }
-    curl -s --request POST $camera_upload_url --header "X-Twilio-Token: $camera_token" --data-binary @$TMP_IMG_FILE | \
+    curl -s --request POST "${camera_upload_url}${image_uploading_param}" --header "X-Twilio-Token: $camera_token" --data-binary @$TMP_IMG_FILE | \
         python -c 'import sys, json;o=json.load(sys.stdin); print o["url"]'
 )
 eof
 test $? -eq 0 && echo "Image uploaded to '$mcs_content_url'." || exit -1
 
-alarm_triggered=false
-if [ -f $ALARM_TRIGGER_FILE ];then
-    echo "!!! Alarm triggered !!!"
-    alarm_triggered=true
-    rm -f $ALARM_TRIGGER_FILE
-fi
 
 echo "Update camera '$RUNTIME_CAMERA_ID' snapshot..."
 node <<eof
