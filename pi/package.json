@@ -14,7 +14,8 @@
     "raspicam": "^0.2.13",
     "request": "^2.81.0",
     "twilio-common": "^0.1.6",
-    "twilio-sync": "^0.5.6"
+    "twilio-sync": "^0.5.6",
+    "uuid": "^3.1.0"
   },
   "repository": {
     "type": "git",
