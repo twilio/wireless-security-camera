@@ -155,7 +155,7 @@ module.exports = function(callbacks) {
 
   updateToken: function (cb) {
     var that = this;
-    return $.get("/userauthenticate?" + auth, function (result) {
+    return $.get("/userauthenticator?" + auth, function (result) {
       if (result.success) {
         console.log("token updated:", result);
         token = result.token;
